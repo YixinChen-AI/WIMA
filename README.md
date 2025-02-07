@@ -28,7 +28,7 @@ SimpleITK==2.2.1
 
 # Usage
 1. Install Universal Segmentation model to pre-segment: https://github.com/YixinChen-AI/MPUM
-2. Use function ==extract_suv_based_roi(suv,atlas,savepath)== to extract features from SUV.nii and segmented rois.
-3. Load WIMA parameters from WIMA.csv and calculate ==anomaly_ratio==
+2. Use function *extract_suv_based_roi(suv,atlas,savepath)* to extract features from SUV.nii and segmented rois.
+3. Load WIMA parameters from WIMA.csv and calculate *anomaly_ratio*
 
 (The more convenient version and training code in one script, as well as the PyPI library, will be updated within a month.)
