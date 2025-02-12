@@ -28,7 +28,29 @@ SimpleITK==2.2.1
 
 # Usage
 1. Install Universal Segmentation model to pre-segment: https://github.com/YixinChen-AI/MPUM
-2. Use function *extract_suv_based_roi(suv,atlas,savepath)* to extract features from SUV.nii and segmented rois.
-3. Load WIMA parameters from WIMA.csv and calculate *anomaly_ratio*
+2. use following code:
+```
+WIMA = load_WIMA()
+
+# suv = sitk.ReadImage("./sampledata/CN_suv_brain.nii.gz")
+# seg = sitk.ReadImage("./sampledata/CN_suv_brain_seg.nii.gz")
+
+suv = sitk.ReadImage("./sampledata/EMCI_suv_brain.nii.gz")
+seg = sitk.ReadImage("./sampledata/EMCI_suv_brain_seg.nii.gz")
+
+# suv = sitk.ReadImage("./sampledata/AD_suv_brain.nii.gz")
+# seg = sitk.ReadImage("./sampledata/AD_suv_brain_seg.nii.gz")
+op = extract_suv_based_roi(suv,seg,"sampledata/")
+
+anomaly_value = detect_anomaly(WIMA,op,mode='brain')
+print(anomaly_value)
+suv = sitk.GetArrayFromImage(suv)
+seg = sitk.GetArrayFromImage(seg)
+
+plot_anomaly_pattern(suv,seg,mode='brain')
+```
+You could get a figure like this:
+![Alt text](./figures/anomaly_pattern_visualization.png)
+
 
 (The more convenient version and training code in one script, as well as the PyPI library, will be updated within a month.)
