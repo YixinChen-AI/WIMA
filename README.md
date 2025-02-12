@@ -20,10 +20,8 @@ This package is supported for *Linux*. The package has been tested on the follow
 ### Python Dependencies
 `MPUM` mainly depends on the Python scientific stack.
 ```
-numpy
-tqdm
-monai==1.2.0
 SimpleITK==2.2.1
+pip install numpy tqdm matplotlib scipy
 ```
 
 # Usage
