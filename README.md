@@ -1,64 +1,65 @@
-# Whole-Body Inter-Organ Metabolic Atlas for PET/CT Anomaly Detection
+# Total-Body ${}^{18}$F-FDG PET Metabolic Connectomics
 
 ![](./figures/first.png)
 
-Medical anomaly detection (MAD) in PET/CT is critical for diagnosing and planning treatments for a broad range of systemic diseases. However, existing deep learning–based MAD approaches often encounter high noise in PET scans and struggle to learn normal representations in the presence of anomalies, resulting in overfitting and diminished detection accuracy. To address these challenges, we propose a novel method that integrates multi-organ metabolic analysis into MAD by constructing a Whole-body Inter-Organ Metabolic Atlas (WIMA). Developed using linear regression and deep-learning-based pre-segmentation, WIMA captures thousands of inter-organ metabolic associations under normal conditions. Unlike traditional ``black box" deep learning methods, this atlas provides transparent, interpretable explanations for anomaly classification. We evaluate WIMA on cancer (lymphoma, melanoma, and lung cancer), epilepsy, and Alzheimer’s disease (AD), demonstrating superior anomaly detection performance and revealing distinct metabolic signatures across diverse pathologies.
+**A Whole-Body Inter-Organ Metabolic Atlas (WIMA) Framework for Anomaly Detection and Systemic Analysis**
 
-## Features
+Medical anomaly detection (MAD) in PET/CT is critical for diagnosing and planning treatments for a broad range of systemic diseases. However, existing deep learning–based approaches (e.g., Autoencoders, GANs) often struggle with the high noise inherent in PET scans and fail to learn robust normal representations, leading to overfitting and "black box" decisions.
 
-- **Feature 1**: A novel Whole-body Inter-Organ Metabolic Atlas (WIMA) is proposed for anomaly detection in whole-body 18F-FDG PET/CT scans. It integrates an atlas of inter-organ metabolic associations and unbiased linear regression techniques to identify pathological deviations effectively.
-- **Feature 2**: WIMA outperforms advanced anomaly detection methods such as AE, VAE, MemAE, and GANomaly. It achieves higher accuracy with significantly reduced computational resources, as demonstrated by AUC and AP metrics in different datasets.
-- **Feature 3**: It provides valuable insights into disease pathology. For example, WIMA highlights the thymus as a key organ in lymphoma and reveals the involvement of ribs and vertebrae in lung cancer. It also detects metabolic anomalies associated with epilepsy, offering evidence of aberrant brain metabolism. Moreover, WIMA differentiates distinct metabolic patterns in Alzheimer’s Disease (AD) and Mild Cognitive Impairment (MCI), aiding both diagnosis and the assessment of disease progression.
+To address these challenges, we propose a novel framework that integrates **Metabolic Connectomics** into anomaly detection by constructing a **Whole-body Inter-Organ Metabolic Atlas (WIMA)**. By leveraging the Reference Metabolic Connectome (RMC) derived from healthy controls, our method captures thousands of inter-organ metabolic associations. Unlike traditional deep learning methods, this atlas provides **transparent, biologically interpretable** explanations for anomaly classification.
 
-## Method
+We evaluate this framework on **Alzheimer’s disease (AD)**, **Cancer (lymphoma, melanoma, lung cancer)**, and **Epilepsy**, demonstrating superior detection performance and revealing distinct whole-person metabolic fingerprints across diverse pathologies.
+
+---
+
+## 🌟 Features
+
+- **Reference Metabolic Connectome (RMC)**  
+  A novel atlas constructed from whole-body ${}^{18}$F-FDG PET/CT scans of healthy controls. It uses unbiased linear regression and anatomical segmentation to model normative inter-organ metabolic associations, serving as a robust baseline for identifying pathological deviations.
+
+- **Superior Anomaly Detection**  
+  WIMA consistently outperforms advanced unsupervised methods such as AE, VAE, MemAE, and GANomaly. It achieves higher AUC and AP metrics across multiple datasets while requiring significantly fewer computational resources.
+
+- **Clinical Interpretability & Systemic Insight**  
+  The framework moves beyond binary classification to provide physiological insights:
+  - **Lymphoma:** Highlights thymic involvement.
+  - **Lung Cancer:** Reveals distinct metabolic patterns in ribs and vertebrae.
+  - **Epilepsy:** Detects aberrant brain metabolism.
+  - **Alzheimer’s Disease (AD):** Differentiates AD and MCI from controls by identifying specific brain–body decoupling (e.g., muscle–brain connections), aiding in diagnosis and disease progression assessment.
+
+---
+
+## 🛠️ Method
+
 ![](./figures/overview.png)
 
-## Anomaly Pattern Visualization
+Our pipeline consists of:
+1.  **Universal Segmentation:** Using [MPUM](https://github.com/YixinChen-AI/MPUM) to define anatomical ROIs.
+2.  **RMC Construction:** Modeling pairwise metabolic dependencies in healthy controls.
+3.  **Anomaly Detection:** Calculating Individual Metabolic Deviations (IMD) for new patients.
+
+---
+
+## 📊 Anomaly Pattern Visualization
+
 ![](./figures/pattern.png)
+*Visualization of metabolic anomaly patterns across different pathologies.*
 
-# System Requirements
-## Hardware requirements
-`MPUM` package requires only a standard computer with enough RAM and a NVIDIA GPU with more than 12G momery.
+---
 
-## Software requirements
-### OS Requirements
-This package is supported for *Linux*. The package has been tested on the following systems:
-+ Linux: Ubuntu 20.04, Rocky Linux
+## 💻 System Requirements
 
-### Python Dependencies
-`MPUM` mainly depends on the Python scientific stack.
-```
+### Hardware Requirements
+- **CPU:** Standard computer with sufficient RAM.
+- **GPU:** NVIDIA GPU with **>12GB VRAM** (Required for the MPUM segmentation step).
+
+### Software Requirements
+**OS:**
+- Linux (Tested on Ubuntu 20.04, Rocky Linux)
+
+**Python Dependencies:**
+```txt
 numpy
 tqdm
 monai==1.2.0
 SimpleITK==2.2.1
-```
-
-# Usage
-1. Install Universal Segmentation model to pre-segment: https://github.com/YixinChen-AI/MPUM
-2. use following code:
-```
-WIMA = load_WIMA()
-
-# suv = sitk.ReadImage("./sampledata/CN_suv_brain.nii.gz")
-# seg = sitk.ReadImage("./sampledata/CN_suv_brain_seg.nii.gz")
-
-suv = sitk.ReadImage("./sampledata/EMCI_suv_brain.nii.gz")
-seg = sitk.ReadImage("./sampledata/EMCI_suv_brain_seg.nii.gz")
-
-# suv = sitk.ReadImage("./sampledata/AD_suv_brain.nii.gz")
-# seg = sitk.ReadImage("./sampledata/AD_suv_brain_seg.nii.gz")
-op = extract_suv_based_roi(suv,seg,"sampledata/")
-
-anomaly_value = detect_anomaly(WIMA,op,mode='brain')
-print(anomaly_value)
-suv = sitk.GetArrayFromImage(suv)
-seg = sitk.GetArrayFromImage(seg)
-
-plot_anomaly_pattern(suv,seg,mode='brain')
-```
-You could get a figure like this:
-![Alt text](./figures/anomaly_pattern_visualization.png)
-
-
-(The more convenient version and training code in one script, as well as the PyPI library, will be updated within a month.)
