@@ -1,56 +1,66 @@
-# Total-Body ${}^{18}$F-FDG PET Metabolic Connectomics
-
-![](./figures/first.png)
-
-**A Whole-Body Inter-Organ Metabolic Atlas (WIMA) Framework for Anomaly Detection and Systemic Analysis**
-
-Medical anomaly detection (MAD) in PET/CT is critical for diagnosing and planning treatments for a broad range of systemic diseases. However, existing deep learning–based approaches (e.g., Autoencoders, GANs) often struggle with the high noise inherent in PET scans and fail to learn robust normal representations, leading to overfitting and "black box" decisions.
-
-To address these challenges, we propose a novel framework that integrates **Metabolic Connectomics** into anomaly detection by constructing a **Whole-body Inter-Organ Metabolic Atlas (WIMA)**. By leveraging the Reference Metabolic Connectome (RMC) derived from healthy controls, our method captures thousands of inter-organ metabolic associations. Unlike traditional deep learning methods, this atlas provides **transparent, biologically interpretable** explanations for anomaly classification.
-
-We evaluate this framework on **Alzheimer’s disease (AD)**, **Cancer (lymphoma, melanoma, lung cancer)**, and **Epilepsy**, demonstrating superior detection performance and revealing distinct whole-person metabolic fingerprints across diverse pathologies.
-
----
-
-## 🌟 Features
-
-- **Reference Metabolic Connectome (RMC)**  
-  A novel atlas constructed from whole-body ${}^{18}$F-FDG PET/CT scans of healthy controls. It uses unbiased linear regression and anatomical segmentation to model normative inter-organ metabolic associations, serving as a robust baseline for identifying pathological deviations.
-
-- **Superior Anomaly Detection**  
-  WIMA consistently outperforms advanced unsupervised methods such as AE, VAE, MemAE, and GANomaly. It achieves higher AUC and AP metrics across multiple datasets while requiring significantly fewer computational resources.
-
-- **Clinical Interpretability & Systemic Insight**  
-  The framework moves beyond binary classification to provide physiological insights:
-  - **Lymphoma:** Highlights thymic involvement.
-  - **Lung Cancer:** Reveals distinct metabolic patterns in ribs and vertebrae.
-  - **Epilepsy:** Detects aberrant brain metabolism.
-  - **Alzheimer’s Disease (AD):** Differentiates AD and MCI from controls by identifying specific brain–body decoupling (e.g., muscle–brain connections), aiding in diagnosis and disease progression assessment.
-
----
-
-## 🛠️ Method
+# Total-Body ${}^{18}$F-FDG PET Metabolic Fingerprinting for Alzheimer’s Disease
 
 ![](./figures/overview.png)
 
-Our pipeline consists of:
-1.  **Universal Segmentation:** Using [MPUM](https://github.com/YixinChen-AI/MPUM) to define anatomical ROIs.
-2.  **RMC Construction:** Modeling pairwise metabolic dependencies in healthy controls.
-3.  **Anomaly Detection:** Calculating Individual Metabolic Deviations (IMD) for new patients.
+**A Connectomic Framework for Subnetwork Deviations and Clinical Phenotype Association**
+
+Alzheimer’s disease (AD) is classically defined as a cerebral neurodegenerative disorder. However, accumulating evidence suggests that AD entails **systemic metabolic disturbances** beyond the central nervous system, including sarcopenia, metabolic dysfunction, and reduced pulmonary function. Traditional analyses confined to the brain often miss these clinically relevant whole-body signals.
+
+We propose a novel **Total-Body Metabolic Connectomics** framework. By constructing a normative **Reference Metabolic Connectome (RMC)** from healthy controls and deriving **Individual Metabolic Deviation (IMD)** networks for patients, this method shifts PET interpretation from regional uptake maps to individualized **brain–body deviation networks**.
+
+This repository contains the implementation of the framework, which has been validated to effectively stratify AD patients along heterogeneous clinical dimensions—ranging from memory impairment to motor and emotional deficits—demonstrating the added value of extracranial subnetworks.
 
 ---
 
-## 📊 Anomaly Pattern Visualization
+## 🌟 Key Highlights
 
-![](./figures/pattern.png)
-*Visualization of metabolic anomaly patterns across different pathologies.*
+### 1. From "Brain-Only" to "Whole-Person"
+Unlike traditional pipelines that crop the brain, our framework integrates **202 anatomical regions (ROIs)** covering the brain and peripheral organs (e.g., lungs, heart, muscles, bones) into a unified metabolic graph. We demonstrate that **total-body features outperform brain-only features** for detecting symptoms with systemic physiological components (e.g., spatial disorientation, motor impairment).
+
+### 2. Normative Modeling (RMC & IMD)
+- **Reference Metabolic Connectome (RMC):** An age- and sex-adjusted normative atlas modeling the "expected" metabolic coupling between organ pairs in health.
+- **Individual Metabolic Deviation (IMD):** A patient-specific network quantifying how much an individual's organ-to-organ coupling deviates from the norm.
+
+### 3. Interpretable Mesoscale Metrics
+We move beyond "black box" prediction by summarizing high-dimensional deviations into biologically interpretable metrics:
+- **SMB (Intra-Subnetwork Metabolic Bias):** Overall burden of abnormal coupling within a system.
+- **SMS (Intra-Subnetwork Metabolic Stability):** Heterogeneity of deviations.
+- **C-SMB (Cross-Subnetwork Metabolic Bias):** Disruption in communication between two systems (e.g., Brain–Muscle uncoupling).
+
+### 4. Symptom-Level Stratification
+The framework does not just diagnose AD; it profiles **5 distinct clinical phenotypes**:
+- **Memory Impairment:** Linked to cerebral DMN deviations.
+- **Motor Impairment & Emotional Changes:** Linked to **Cerebellar** and **Brain–Body** couplings.
+- **Spatial Disorientation & Language Decline:** Linked to specific cross-network disruptions.
+
+---
+
+## 🛠️ Methodology
+
+The pipeline consists of three core stages:
+
+1. **Universal Segmentation:** Utilizing [MPUM](https://github.com/YixinChen-AI/MPUM) to segment total-body PET/CT into 202 anatomical ROIs.
+2. **RMC Construction:** Building the normative baseline using pairwise linear regression on healthy controls.
+3. **IMD & Feature Extraction:** Calculating standardized prediction residuals and aggregating them into subnetwork metrics (SMB, SMS, C-SMB).
+
+![](./figures/RMC.png)
+*Figure: The Reference Metabolic Connectome (RMC) matrix showing normative metabolic correlations between 202 ROIs across the brain and body. Rows and columns are ordered by functional subnetworks.*
+
+---
+
+## 📊 Feature Importance & Clinical Insights
+
+Our analysis reveals that different AD symptoms map onto distinct metabolic subnetwork disruptions. While memory deficits are centrally driven, other symptoms involve significant extracranial components.
+
+![](./figures/importance.png)
+*Figure: Permutation-based feature importance for symptom classification. Note the significant contribution of Cerebellar and Brain-Body connections (e.g., Brain-Lung, Brain-Muscle) in non-memory domains.*
 
 ---
 
 ## 💻 System Requirements
 
 ### Hardware Requirements
-- **CPU:** Standard computer with sufficient RAM.
+- **CPU:** Standard computer with sufficient RAM (16GB+ recommended).
 - **GPU:** NVIDIA GPU with **>12GB VRAM** (Required for the MPUM segmentation step).
 
 ### Software Requirements
@@ -63,3 +73,5 @@ numpy
 tqdm
 monai==1.2.0
 SimpleITK==2.2.1
+sklearn
+scipy
