@@ -2,65 +2,67 @@
 
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Chenyixin/TotalBody-18F-FDG-Connectomics)
 
-Companion resources for an individualized metabolic deviation fingerprinting framework for brain and total-body ${}^{18}$F-FDG PET.
+This repository provides the core implementation of the individualized metabolic deviation fingerprinting framework described in the associated paper.
 
-## Overview
+![Framework overview](figures/overview.png)
 
-The framework characterizes how an individual subject's inter-regional metabolic relationships deviate from a cognitively normal reference. It consists of four main steps:
+## Method
 
-1. Adjust regional PET uptake values for demographic covariates.
-2. Estimate a Reference Metabolic Graph (RMG) from cognitively normal training subjects.
-3. Derive an Individual Metabolic Deviation (IMD) matrix using standardized bidirectional prediction residuals.
-4. Aggregate edge-wise deviations into reliability-weighted within- and between-subnetwork fingerprints.
+The framework characterizes how an individual subject's inter-regional metabolic relationships deviate from a cognitively normal reference.
 
-## Evaluation settings
+1. Regional PET uptake values are adjusted for age and sex using cognitively normal training subjects.
+2. A directed Reference Metabolic Graph is estimated from pairwise linear prediction models fitted to the adjusted control data.
+3. Each target subject is projected onto the graph using prediction-interval-standardized residuals.
+4. The two directional residuals for each ROI pair are combined using their root-mean-square magnitude to form a symmetric Individual Metabolic Deviation matrix.
+5. Edge-wise deviations are aggregated into reliability-weighted within- and between-subnetwork fingerprints.
 
-The associated study evaluates the framework in two complementary settings:
+![Reference Metabolic Graph](figures/rmg.png)
 
-- ADNI brain ${}^{18}$F-FDG PET: CN-versus-AD diagnostic classification and sMCI-versus-pMCI progression classification.
-- Private total-body ${}^{18}$F-FDG PET: within-AD prediction of spatial disorientation, emotional changes, language decline, and motor impairment.
+The fingerprint contains three feature families:
 
-The total-body analysis uses 202 anatomical regions, comprising 83 cerebral and 119 extracranial regions. Cognitively normal controls are used to estimate the normative reference; symptom prediction is performed within the AD group.
+- Within-subnetwork deviation magnitude, $\Delta^w$.
+- Within-subnetwork deviation heterogeneity, $\Sigma^w$.
+- Between-subnetwork deviation magnitude, $\Gamma^w$.
 
-## Interpretable fingerprint features
+![Total-body results](figures/total_body_results.png)
 
-The IMD matrix is summarized using three feature families:
+## Repository contents
 
-- Within-subnetwork deviation magnitude ($\Delta^w$).
-- Within-subnetwork deviation heterogeneity ($\Sigma^w$).
-- Between-subnetwork deviation magnitude ($\Gamma^w$).
+- `imd.py`: demographic adjustment, Reference Metabolic Graph fitting, Individual Metabolic Deviation mapping, reliability weighting, and subnetwork fingerprint construction.
+- `example.py`: executable example using synthetic ROI data.
+- `tests/test_imd.py`: numerical tests for symmetry, diagonal values, dimensions, and finite outputs.
+- `figures/`: figures corresponding to the paper.
 
-These features retain explicit subnetwork definitions while reducing the dimensionality of the edge-wise deviation matrix.
+## Usage
 
-## Repository scope
+Install the required packages:
 
-The current public repository provides sample data, ROI-level preprocessing utilities, anomaly-visualization code, and an interactive demonstration. The included notebook should not be interpreted as an end-to-end reproduction package for every cross-validation experiment reported in the manuscript.
+```bash
+python -m pip install -r requirements.txt
+```
 
-Interactive demonstration:  
-https://huggingface.co/spaces/Chenyixin/TotalBody-18F-FDG-Connectomics
+Run the synthetic example:
+
+```bash
+python example.py
+```
+
+Run the tests:
+
+```bash
+python -m pytest
+```
+
+## Input requirements
+
+`control_uptake` and `target_uptake` are matrices with subjects in rows and ROIs in columns. Age and sex contain one numeric value per subject. Subnetwork labels contain one label per ROI.
+
+All demographic adjustment parameters, pairwise regression parameters, residual uncertainties, and reliability weights must be estimated from cognitively normal training subjects only. Test subjects must not be used during model fitting.
 
 ## Data availability
 
 ADNI data are available through the ADNI data-access platform. The private total-body PET cohort is not publicly distributed because of patient privacy and ethical restrictions. Access may be considered through the corresponding authors, subject to reasonable request and approval by the relevant ethics committee.
 
----
+## Interactive demonstration
 
-## 💻 System Requirements
-
-### Hardware Requirements
-- **CPU:** Standard computer with sufficient RAM (16GB+ recommended).
-- **GPU:** NVIDIA GPU with **>12GB VRAM** (Required for the MPUM segmentation step).
-
-### Software Requirements
-**OS:**
-- Linux (Tested on Ubuntu 20.04, Rocky Linux)
-
-**Python Dependencies:**
-```txt
-numpy
-tqdm
-monai==1.2.0
-SimpleITK==2.2.1
-sklearn
-scipy
-```
+https://huggingface.co/spaces/Chenyixin/TotalBody-18F-FDG-Connectomics
