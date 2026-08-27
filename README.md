@@ -1,64 +1,47 @@
-# Total-Body ${}^{18}$F-FDG PET Metabolic Fingerprinting for Alzheimer’s Disease
+# Reliability-aware Normative Graph Modeling for Individualized ${}^{18}$F-FDG PET Deviation Fingerprinting Across Brain and Total-body Imaging
 
-<!-- Badges Area -->
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Chenyixin/TotalBody-18F-FDG-Connectomics)
-[![License](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
+Companion resources for an individualized metabolic deviation fingerprinting framework for brain and total-body ${}^{18}$F-FDG PET.
 
-![](./figures/overview.png)
+## Overview
 
-**A Connectomic Framework for Subnetwork Deviations and Clinical Phenotype Association**
+The framework characterizes how an individual subject's inter-regional metabolic relationships deviate from a cognitively normal reference. It consists of four main steps:
 
-Alzheimer’s disease (AD) is classically defined as a cerebral neurodegenerative disorder. However, accumulating evidence suggests that AD entails **systemic metabolic disturbances** beyond the central nervous system, including sarcopenia, metabolic dysfunction, and reduced pulmonary function. Traditional analyses confined to the brain often miss these clinically relevant whole-body signals.
+1. Adjust regional PET uptake values for demographic covariates.
+2. Estimate a Reference Metabolic Graph (RMG) from cognitively normal training subjects.
+3. Derive an Individual Metabolic Deviation (IMD) matrix using standardized bidirectional prediction residuals.
+4. Aggregate edge-wise deviations into reliability-weighted within- and between-subnetwork fingerprints.
 
-We propose a novel **Total-Body Metabolic Connectomics** framework. By constructing a normative **Reference Metabolic Connectome (RMC)** from healthy controls and deriving **Individual Metabolic Deviation (IMD)** networks for patients, this method shifts PET interpretation from regional uptake maps to individualized **brain–body deviation networks**.
+## Evaluation settings
 
-This repository contains the implementation of the framework, which has been validated to effectively stratify AD patients along heterogeneous clinical dimensions—ranging from memory impairment to motor and emotional deficits—demonstrating the added value of extracranial subnetworks.
+The associated study evaluates the framework in two complementary settings:
 
----
+- ADNI brain ${}^{18}$F-FDG PET: CN-versus-AD diagnostic classification and sMCI-versus-pMCI progression classification.
+- Private total-body ${}^{18}$F-FDG PET: within-AD prediction of spatial disorientation, emotional changes, language decline, and motor impairment.
 
-## 🌟 Key Highlights
+The total-body analysis uses 202 anatomical regions, comprising 83 cerebral and 119 extracranial regions. Cognitively normal controls are used to estimate the normative reference; symptom prediction is performed within the AD group.
 
-### 1. From "Brain-Only" to "Whole-Person"
-Unlike traditional pipelines that crop the brain, our framework integrates **202 anatomical regions (ROIs)** covering the brain and peripheral organs (e.g., lungs, heart, muscles, bones) into a unified metabolic graph. We demonstrate that **total-body features outperform brain-only features** for detecting symptoms with systemic physiological components (e.g., spatial disorientation, motor impairment).
+## Interpretable fingerprint features
 
-### 2. Normative Modeling (RMC & IMD)
-- **Reference Metabolic Connectome (RMC):** An age- and sex-adjusted normative atlas modeling the "expected" metabolic coupling between organ pairs in health.
-- **Individual Metabolic Deviation (IMD):** A patient-specific network quantifying how much an individual's organ-to-organ coupling deviates from the norm.
+The IMD matrix is summarized using three feature families:
 
-### 3. Interpretable Mesoscale Metrics
-We move beyond "black box" prediction by summarizing high-dimensional deviations into biologically interpretable metrics:
-- **SMB (Intra-Subnetwork Metabolic Bias):** Overall burden of abnormal coupling within a system.
-- **SMS (Intra-Subnetwork Metabolic Stability):** Heterogeneity of deviations.
-- **C-SMB (Cross-Subnetwork Metabolic Bias):** Disruption in communication between two systems (e.g., Brain–Muscle uncoupling).
+- Within-subnetwork deviation magnitude ($\Delta^w$).
+- Within-subnetwork deviation heterogeneity ($\Sigma^w$).
+- Between-subnetwork deviation magnitude ($\Gamma^w$).
 
-### 4. Symptom-Level Stratification
-The framework does not just diagnose AD; it profiles **5 distinct clinical phenotypes**:
-- **Memory Impairment:** Linked to cerebral DMN deviations.
-- **Motor Impairment & Emotional Changes:** Linked to **Cerebellar** and **Brain–Body** couplings.
-- **Spatial Disorientation & Language Decline:** Linked to specific cross-network disruptions.
+These features retain explicit subnetwork definitions while reducing the dimensionality of the edge-wise deviation matrix.
 
----
+## Repository scope
 
-## 🛠️ Methodology
+The current public repository provides sample data, ROI-level preprocessing utilities, anomaly-visualization code, and an interactive demonstration. The included notebook should not be interpreted as an end-to-end reproduction package for every cross-validation experiment reported in the manuscript.
 
-The pipeline consists of three core stages:
+Interactive demonstration:  
+https://huggingface.co/spaces/Chenyixin/TotalBody-18F-FDG-Connectomics
 
-1. **Universal Segmentation:** Utilizing [MPUM](https://github.com/YixinChen-AI/MPUM) to segment total-body PET/CT into 202 anatomical ROIs.
-2. **RMC Construction:** Building the normative baseline using pairwise linear regression on healthy controls.
-3. **IMD & Feature Extraction:** Calculating standardized prediction residuals and aggregating them into subnetwork metrics (SMB, SMS, C-SMB).
+## Data availability
 
-![](./figures/RMC.png)
-*Figure: The Reference Metabolic Connectome (RMC) matrix showing normative metabolic correlations between 202 ROIs across the brain and body. Rows and columns are ordered by functional subnetworks.*
-
----
-
-## 📊 Feature Importance & Clinical Insights
-
-Our analysis reveals that different AD symptoms map onto distinct metabolic subnetwork disruptions. While memory deficits are centrally driven, other symptoms involve significant extracranial components.
-
-![](./figures/importance.png)
-*Figure: Permutation-based feature importance for symptom classification. Note the significant contribution of Cerebellar and Brain-Body connections (e.g., Brain-Lung, Brain-Muscle) in non-memory domains.*
+ADNI data are available through the ADNI data-access platform. The private total-body PET cohort is not publicly distributed because of patient privacy and ethical restrictions. Access may be considered through the corresponding authors, subject to reasonable request and approval by the relevant ethics committee.
 
 ---
 
@@ -80,3 +63,4 @@ monai==1.2.0
 SimpleITK==2.2.1
 sklearn
 scipy
+```
